@@ -1,0 +1,214 @@
+/* ==========================================================================
+   MennilNexus AI — Tasks & Schedule Styles (Pastel Theme)
+   ========================================================================== */
+
+.tasks-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+.filter-pills {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.filter-pill {
+  padding: 8px 18px;
+  background: #FFFFFF;
+  border: 1.5px solid var(--border-subtle);
+  border-radius: var(--radius-full);
+  color: var(--text-muted);
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition-smooth);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+}
+.filter-pill:hover {
+  border-color: var(--pastel-lavender-border);
+  color: var(--text-main);
+  background: var(--pastel-lavender-light);
+}
+.filter-pill.active {
+  background: var(--pastel-lavender);
+  border-color: var(--pastel-lavender-border);
+  color: var(--text-main);
+  font-weight: 700;
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.12);
+}
+
+/* Task Cards List */
+.task-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.task-card {
+  background: #FFFFFF;
+  border: 1.5px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 16px 22px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  transition: var(--transition-smooth);
+  box-shadow: 0 4px 14px rgba(139, 92, 246, 0.03);
+}
+.task-card:hover {
+  border-color: var(--accent-purple);
+  box-shadow: 0 8px 24px rgba(139, 92, 246, 0.1);
+  transform: translateY(-2px);
+}
+
+.task-card.completed {
+  background: #FAF8FF;
+  border-color: var(--pastel-lavender);
+}
+
+/* Animated Pastel Checkbox */
+.task-checkbox-wrap {
+  position: relative;
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+}
+
+.task-checkbox {
+  appearance: none;
+  width: 24px;
+  height: 24px;
+  border: 2px solid var(--border-medium);
+  border-radius: 8px;
+  background: #FFFFFF;
+  cursor: pointer;
+  outline: none;
+  transition: var(--transition-smooth);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.task-checkbox:hover {
+  border-color: var(--accent-purple);
+  background: var(--pastel-lavender-light);
+}
+.task-checkbox:checked {
+  background: var(--accent-purple);
+  border-color: var(--accent-purple);
+}
+.task-checkbox:checked::after {
+  content: '✓';
+  color: #FFFFFF;
+  font-size: 0.95rem;
+  font-weight: 900;
+}
+
+.task-main {
+  flex: 1;
+  overflow: hidden;
+}
+
+.task-title {
+  font-size: 1.02rem;
+  font-weight: 700;
+  color: var(--text-main);
+  transition: var(--transition-smooth);
+}
+
+.task-card.completed .task-title {
+  text-decoration: line-through;
+  color: var(--text-subtle);
+}
+
+.task-desc {
+  font-size: 0.84rem;
+  color: var(--text-muted);
+  margin-top: 3px;
+}
+
+.task-badges {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 6px;
+  flex-wrap: wrap;
+}
+
+.badge {
+  font-size: 0.76rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.badge.priority-high {
+  background: var(--status-high-bg);
+  color: #E11D48;
+  border: 1px solid rgba(244, 63, 94, 0.2);
+}
+.badge.priority-medium {
+  background: var(--status-med-bg);
+  color: #D97706;
+  border: 1px solid rgba(245, 158, 11, 0.2);
+}
+.badge.priority-low {
+  background: var(--status-low-bg);
+  color: #059669;
+  border: 1px solid rgba(16, 185, 129, 0.2);
+}
+.badge.time-badge {
+  background: #F4EFFF;
+  color: var(--accent-purple);
+  border: 1px solid var(--pastel-lavender-border);
+}
+.badge.deadline-badge {
+  background: #FFE0E6;
+  color: #E11D48;
+  border: 1px solid rgba(244, 63, 94, 0.25);
+}
+
+.task-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.task-btn-icon {
+  background: #FFFFFF;
+  color: var(--text-subtle);
+  border: 1.5px solid var(--border-subtle);
+  padding: 8px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition-smooth);
+}
+.task-btn-icon:hover {
+  background: var(--pastel-lavender-light);
+  color: var(--accent-purple);
+  border-color: var(--accent-purple);
+}
+.task-btn-icon.delete:hover {
+  background: var(--status-high-bg);
+  color: var(--status-high);
+  border-color: var(--status-high);
+}
+
+.empty-task-placeholder {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--text-muted);
+}
+.empty-task-placeholder svg {
+  margin-bottom: 12px;
+  stroke: var(--accent-purple);
+}

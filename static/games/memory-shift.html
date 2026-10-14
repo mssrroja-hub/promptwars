@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Memory Shift — MennilNexus AI Mental Fitness</title>
+  <link rel="stylesheet" href="/static/css/main.css">
+  <style>
+    body {
+      background: var(--bg-cream);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      padding: 24px;
+      position: relative;
+    }
+    body::before {
+      content: '';
+      position: fixed;
+      top: -100px;
+      left: 15%;
+      width: 450px;
+      height: 450px;
+      background: radial-gradient(circle, rgba(217, 248, 232, 0.5) 0%, rgba(221, 242, 255, 0.3) 60%, transparent 75%);
+      pointer-events: none;
+      z-index: 0;
+    }
+    .game-wrapper {
+      max-width: 680px;
+      width: 100%;
+      background: #FFFFFF;
+      border: 1.5px solid var(--pastel-mint-border);
+      border-radius: var(--radius-xl);
+      padding: 32px;
+      box-shadow: var(--shadow-card);
+      text-align: center;
+      position: relative;
+      z-index: 1;
+    }
+    .game-top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 16px;
+      border-bottom: 1.5px solid var(--border-subtle);
+      text-align: left;
+    }
+    .stat-pill {
+      font-size: 0.88rem;
+      background: var(--pastel-mint-light);
+      border: 1px solid var(--pastel-mint-border);
+      color: var(--text-main);
+      padding: 6px 14px;
+      border-radius: var(--radius-full);
+      font-weight: 700;
+    }
+    .mode-indicator {
+      display: inline-block;
+      padding: 8px 22px;
+      border-radius: var(--radius-full);
+      font-weight: 700;
+      font-size: 1rem;
+      margin-bottom: 18px;
+      transition: all 0.3s ease;
+    }
+    .mode-forward {
+      background: var(--pastel-mint);
+      color: #047857;
+      border: 1.5px solid var(--pastel-mint-border);
+    }
+    .mode-reverse {
+      background: var(--pastel-pink);
+      color: #BE123C;
+      border: 1.5px solid var(--pastel-pink-border);
+      animation: pulseGlow 1.5s infinite;
+    }
+    @keyframes pulseGlow {
+      0%, 100% { box-shadow: 0 0 10px rgba(236, 72, 153, 0.15); }
+      50% { box-shadow: 0 0 20px rgba(236, 72, 153, 0.35); }
+    }
+    .display-screen {
+      height: 160px;
+      background: linear-gradient(135deg, #FAF8FF 0%, #FFFFFF 100%);
+      border: 2px solid var(--pastel-mint-border);
+      border-radius: var(--radius-lg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 4rem;
+      font-weight: 800;
+      color: var(--accent-purple);
+      margin-bottom: 24px;
+      letter-spacing: 4px;
+      box-shadow: inset 0 2px 8px rgba(139, 92, 246, 0.04);
+    }
+    .keypad-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      max-width: 320px;
+      margin: 0 auto;
+    }
+    .key-btn {
+      padding: 16px;
+      background: #FFFFFF;
+      border: 2px solid var(--border-medium);
+      border-radius: var(--radius-md);
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--text-main);
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.03);
+      transition: all 0.15s ease;
+    }
+    .key-btn:hover {
+      border-color: var(--accent-purple);
+      background: var(--pastel-lavender-light);
+      transform: translateY(-2px);
+    }
+    .user-input-slots {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 20px;
+      min-height: 44px;
+    }
+    .input-slot {
+      width: 44px;
+      height: 44px;
+      border: 2px solid var(--border-medium);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+    .input-slot.filled {
+      border-color: var(--accent-teal);
+      background: rgba(20, 184, 166, 0.1);
+    }
+    .modal-overlay-game {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(7, 10, 18, 0.85);
+      backdrop-filter: blur(10px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+    }
+    .modal-overlay-game.active { display: flex; }
+  </style>
+</head>
+<body>
+
+<div class="game-wrapper">
+  <div class="game-top-bar">
+    <div>
+      <h2 style="font-size:1.35rem;font-weight:700;">🔄 Memory Shift</h2>
+      <div style="font-size:0.8rem;color:var(--accent-teal);">Working Memory & Cognitive Flexibility</div>
+    </div>
+    <div style="display:flex;gap:10px;align-items:center;">
+      <span class="stat-pill" id="game-timer">⏱ 05:00</span>
+      <span class="stat-pill" style="color:var(--accent-teal);" id="game-score">Score: 0</span>
+      <span class="stat-pill" id="game-level">Lvl 1</span>
+      <button class="btn-secondary" id="btn-show-instructions" style="padding:6px 12px;font-size:0.82rem;">Rules</button>
+      <button class="btn-secondary" id="btn-exit-game" style="padding:6px 12px;font-size:0.82rem;">Exit</button>
+    </div>
+  </div>
+
+  <div class="mode-indicator mode-forward" id="mode-badge">
+    ▶ FORWARD ORDER: Recall items in the order they appeared
+  </div>
+
+  <div class="display-screen" id="display-screen">
+    Ready?
+  </div>
+
+  <div class="user-input-slots" id="input-slots">
+    <!-- Populated during answer phase -->
+  </div>
+
+  <div class="keypad-grid" id="keypad">
+    <button class="key-btn" data-key="1">1</button>
+    <button class="key-btn" data-key="2">2</button>
+    <button class="key-btn" data-key="3">3</button>
+    <button class="key-btn" data-key="4">4</button>
+    <button class="key-btn" data-key="5">5</button>
+    <button class="key-btn" data-key="6">6</button>
+    <button class="key-btn" data-key="7">7</button>
+    <button class="key-btn" data-key="8">8</button>
+    <button class="key-btn" data-key="9">9</button>
+    <button class="key-btn" data-key="clear" style="font-size:0.95rem;color:var(--status-high);">Clear</button>
+    <button class="key-btn" data-key="0">0</button>
+    <button class="key-btn" data-key="submit" style="font-size:0.95rem;color:var(--accent-teal);">Submit</button>
+  </div>
+</div>
+
+<!-- Time Up Modal -->
+<div class="modal-overlay-game" id="modal-game-over">
+  <div class="modal-content" style="max-width:440px;text-align:center;padding:32px;">
+    <div style="font-size:2.8rem;margin-bottom:8px;">🧠</div>
+    <h3 style="font-size:1.5rem;font-weight:700;margin-bottom:6px;">Workout Complete!</h3>
+    <p style="color:var(--text-muted);font-size:0.9rem;margin-bottom:20px;">
+      Your working memory recall and cognitive shifting performed brilliantly.
+    </p>
+    <div style="background:rgba(255,255,255,0.05);padding:16px;border-radius:12px;margin-bottom:24px;">
+      <div style="font-size:2rem;font-weight:800;color:var(--accent-teal);" id="final-score-val">0</div>
+      <div style="font-size:0.82rem;color:var(--text-muted);">Points Earned</div>
+      <div style="margin-top:8px;font-size:0.88rem;color:var(--accent-lavender);" id="final-accuracy-val">Accuracy: 100%</div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      <button class="btn-primary" id="btn-save-and-exit" style="width:100%;padding:12px;">💾 Save Score & Return to App</button>
+      <button class="btn-secondary" id="btn-keep-playing" style="width:100%;padding:12px;">🎮 Keep Playing (Casual Mode)</button>
+    </div>
+  </div>
+</div>
+
+<!-- Instructions Modal -->
+<div class="modal-overlay-game" id="modal-instructions">
+  <div class="modal-content" style="max-width:480px;padding:28px;">
+    <h3 style="margin-bottom:12px;">How to Play Memory Shift</h3>
+    <ul style="color:var(--text-muted);font-size:0.9rem;line-height:1.6;margin-left:20px;margin-bottom:20px;">
+      <li>Numbers will flash on screen one by one. Memorize them in order.</li>
+      <li>Pay close attention to the Mode Badge:
+        <br>• <strong>FORWARD ORDER:</strong> Type the digits in the exact order shown.
+        <br>• <strong>REVERSE ORDER:</strong> Type the digits backwards from last to first!</li>
+      <li>As you level up, sequence lengths increase from 3 up to 8 numbers.</li>
+      <li>Points scale with sequence length and accuracy.</li>
+    </ul>
+    <button class="btn-primary" id="btn-close-instructions" style="width:100%;padding:10px;">Let's Begin</button>
+  </div>
+</div>
+
+<script type="module">
+  import { apiRequest } from '/static/js/api.js';
+
+  const urlParams = new URLSearchParams(window.location.search);
+  let sessionMinutes = parseInt(urlParams.get('duration') || 5);
+  let timeRemaining = sessionMinutes * 60;
+  let score = 0;
+  let level = 1;
+  let roundsCompleted = 0;
+  let roundsCorrect = 0;
+  let isReverseMode = false;
+  let currentSequence = [];
+  let userInputs = [];
+  let isCasualMode = false;
+
+  function initGame() {
+    startTimer();
+    startNewRound();
+
+    document.getElementById('btn-show-instructions').onclick = () => document.getElementById('modal-instructions').classList.add('active');
+    document.getElementById('btn-close-instructions').onclick = () => document.getElementById('modal-instructions').classList.remove('active');
+    document.getElementById('btn-exit-game').onclick = () => { if (confirm('Exit Memory Shift?')) window.close(); };
+    document.getElementById('btn-keep-playing').onclick = () => {
+      document.getElementById('modal-game-over').classList.remove('active');
+      isCasualMode = true;
+      document.getElementById('game-timer').textContent = 'Casual Mode ♾️';
+    };
+    document.getElementById('btn-save-and-exit').onclick = async () => {
+      await saveScoreToDb();
+      window.close();
+    };
+
+    // Keypad binding
+    document.querySelectorAll('.key-btn').forEach(btn => {
+      btn.onclick = () => handleKey(btn.dataset.key);
+    });
+  }
+
+  function startNewRound() {
+    userInputs = [];
+    isReverseMode = (roundsCompleted > 0 && roundsCompleted % 2 === 1);
+    
+    const badge = document.getElementById('mode-badge');
+    if (isReverseMode) {
+      badge.className = 'mode-indicator mode-reverse';
+      badge.textContent = '⚡ REVERSE ORDER: Shift gears! Recall digits in REVERSE order!';
+    } else {
+      badge.className = 'mode-indicator mode-forward';
+      badge.textContent = '▶ FORWARD ORDER: Recall items in the order shown';
+    }
+
+    // Sequence length: starts at 3, expands with level
+    const seqLength = Math.min(3 + Math.floor(level / 2), 7);
+    currentSequence = [];
+    for (let i = 0; i < seqLength; i++) {
+      currentSequence.push(Math.floor(Math.random() * 10));
+    }
+
+    renderInputSlots(seqLength);
+    disableKeypad(true);
+
+    // Play sequence
+    const screen = document.getElementById('display-screen');
+    let idx = 0;
+    screen.textContent = 'Get Ready';
+
+    setTimeout(() => {
+      const interval = setInterval(() => {
+        if (idx < currentSequence.length) {
+          screen.textContent = currentSequence[idx];
+          idx++;
+        } else {
+          clearInterval(interval);
+          screen.textContent = 'ENTER NOW';
+          disableKeypad(false);
+        }
+      }, 900);
+    }, 1000);
+  }
+
+  function renderInputSlots(length) {
+    const container = document.getElementById('input-slots');
+    container.innerHTML = Array.from({ length }).map((_, i) => `<div class="input-slot" id="slot-${i}">_</div>`).join('');
+  }
+
+  function disableKeypad(disabled) {
+    document.querySelectorAll('.key-btn').forEach(b => b.disabled = disabled);
+  }
+
+  function handleKey(key) {
+    const requiredLength = currentSequence.length;
+    if (key === 'clear') {
+      userInputs = [];
+      updateSlotDisplay();
+      return;
+    }
+    if (key === 'submit') {
+      if (userInputs.length === requiredLength) {
+        checkAnswer();
+      }
+      return;
+    }
+
+    if (userInputs.length < requiredLength) {
+      userInputs.push(parseInt(key));
+      updateSlotDisplay();
+      if (userInputs.length === requiredLength) {
+        setTimeout(checkAnswer, 300);
+      }
+    }
+  }
+
+  function updateSlotDisplay() {
+    for (let i = 0; i < currentSequence.length; i++) {
+      const slot = document.getElementById(`slot-${i}`);
+      if (slot) {
+        if (i < userInputs.length) {
+          slot.textContent = userInputs[i];
+          slot.classList.add('filled');
+        } else {
+          slot.textContent = '_';
+          slot.classList.remove('filled');
+        }
+      }
+    }
+  }
+
+  function checkAnswer() {
+    disableKeypad(true);
+    roundsCompleted++;
+    const target = isReverseMode ? [...currentSequence].reverse() : [...currentSequence];
+    const isCorrect = userInputs.join('') === target.join('');
+    const screen = document.getElementById('display-screen');
+
+    if (isCorrect) {
+      roundsCorrect++;
+      const points = (currentSequence.length * 80) + (isReverseMode ? 100 : 50);
+      score += points;
+      document.getElementById('game-score').textContent = `Score: ${score}`;
+      screen.style.color = '#5eead4';
+      screen.textContent = '✓ EXCELLENT!';
+    } else {
+      screen.style.color = '#fda4af';
+      screen.textContent = `✕ Expected: ${target.join(' ')}`;
+    }
+
+    if (roundsCompleted % 2 === 0) {
+      level++;
+      document.getElementById('game-level').textContent = `Lvl ${level}`;
+    }
+
+    setTimeout(() => {
+      screen.style.color = 'var(--accent-teal)';
+      startNewRound();
+    }, 2000);
+  }
+
+  function startTimer() {
+    const timerEl = document.getElementById('game-timer');
+    const interval = setInterval(() => {
+      if (isCasualMode) return;
+      timeRemaining--;
+      const mins = Math.floor(timeRemaining / 60);
+      const secs = timeRemaining % 60;
+      timerEl.textContent = `⏱ ${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+      if (timeRemaining <= 0) {
+        clearInterval(interval);
+        handleTimeUp();
+      }
+    }, 1000);
+  }
+
+  function handleTimeUp() {
+    const accuracy = roundsCompleted > 0 ? Math.round((roundsCorrect / roundsCompleted) * 100) : 100;
+    document.getElementById('final-score-val').textContent = score.toLocaleString();
+    document.getElementById('final-accuracy-val').textContent = `Accuracy: ${accuracy}% (${roundsCorrect}/${roundsCompleted} rounds)`;
+    document.getElementById('modal-game-over').classList.add('active');
+    saveScoreToDb();
+  }
+
+  async function saveScoreToDb() {
+    const accuracy = roundsCompleted > 0 ? Math.round((roundsCorrect / roundsCompleted) * 100) : 100;
+    try {
+      await apiRequest('/games/scores', 'POST', {
+        game_id: 'memory-shift',
+        score,
+        level_reached: level,
+        duration_sec: sessionMinutes * 60,
+        accuracy
+      });
+    } catch (err) {
+      console.warn('Score save notice:', err);
+    }
+  }
+
+  window.onload = initGame;
+</script>
+</body>
+</html>

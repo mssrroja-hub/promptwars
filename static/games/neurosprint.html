@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NeuroSprint — MennilNexus AI Mental Fitness</title>
+  <link rel="stylesheet" href="/static/css/main.css">
+  <style>
+    body {
+      background: var(--bg-cream);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      padding: 24px;
+      position: relative;
+    }
+    body::before {
+      content: '';
+      position: fixed;
+      top: -100px;
+      right: 15%;
+      width: 450px;
+      height: 450px;
+      background: radial-gradient(circle, rgba(221, 242, 255, 0.5) 0%, rgba(233, 223, 255, 0.3) 60%, transparent 75%);
+      pointer-events: none;
+      z-index: 0;
+    }
+    .game-wrapper {
+      max-width: 680px;
+      width: 100%;
+      background: #FFFFFF;
+      border: 1.5px solid var(--pastel-baby-blue-border);
+      border-radius: var(--radius-xl);
+      padding: 32px;
+      box-shadow: var(--shadow-card);
+      text-align: center;
+      position: relative;
+      z-index: 1;
+    }
+    .game-top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 16px;
+      border-bottom: 1.5px solid var(--border-subtle);
+      text-align: left;
+    }
+    .stat-pill {
+      font-size: 0.88rem;
+      background: var(--pastel-baby-blue-light);
+      border: 1px solid var(--pastel-baby-blue-border);
+      color: var(--text-main);
+      padding: 6px 14px;
+      border-radius: var(--radius-full);
+      font-weight: 700;
+    }
+    .combo-bar-wrap {
+      height: 9px;
+      background: #F1EDFF;
+      border-radius: var(--radius-full);
+      overflow: hidden;
+      margin-bottom: 24px;
+    }
+    .combo-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #38BDF8, #8B5CF6);
+      width: 100%;
+      transition: width 0.1s linear;
+    }
+    .question-card {
+      background: linear-gradient(135deg, #FAF8FF 0%, #FFFFFF 100%);
+      border: 2px solid var(--pastel-baby-blue-border);
+      border-radius: var(--radius-lg);
+      padding: 36px 20px;
+      margin-bottom: 24px;
+      box-shadow: 0 4px 14px rgba(56, 189, 248, 0.08);
+    }
+    .question-prompt {
+      font-size: 0.88rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--accent-purple);
+      margin-bottom: 10px;
+      font-weight: 700;
+    }
+    .question-main {
+      font-size: 2.4rem;
+      font-weight: 800;
+      font-family: var(--font-heading);
+      color: var(--text-main);
+    }
+    .options-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+    .option-btn {
+      padding: 18px 20px;
+      background: #FFFFFF;
+      border: 2px solid var(--border-medium);
+      border-radius: var(--radius-md);
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: var(--text-main);
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+      transition: all 0.15s ease;
+    }
+    .option-btn:hover {
+      border-color: var(--accent-purple);
+      background: var(--pastel-baby-blue-light);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(56, 189, 248, 0.15);
+    }
+    .option-btn.correct {
+      border-color: #10B981 !important;
+      background: var(--pastel-mint) !important;
+      color: #047857 !important;
+    }
+    .option-btn.wrong {
+      border-color: #F43F5E !important;
+      background: var(--pastel-pink) !important;
+      color: #BE123C !important;
+    .modal-overlay-game {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(36, 36, 94, 0.45);
+      backdrop-filter: blur(8px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+    }
+    .modal-overlay-game.active {
+      display: flex;
+    }
+  </style>
+</head>
+<body>
+
+<div class="game-wrapper">
+  <div class="game-top-bar">
+    <div>
+      <h2 style="font-size:1.35rem;font-weight:700;">⚡ NeuroSprint</h2>
+      <div style="font-size:0.8rem;color:var(--accent-blue);">Rapid Math, Sequences & Fluid Logic</div>
+    </div>
+    <div style="display:flex;gap:10px;align-items:center;">
+      <span class="stat-pill" id="game-timer">⏱ 05:00</span>
+      <span class="stat-pill" style="color:var(--accent-blue);" id="game-score">Score: 0</span>
+      <span class="stat-pill" id="game-streak">🔥 0x</span>
+      <button class="btn-secondary" id="btn-show-instructions" style="padding:6px 12px;font-size:0.82rem;">Rules</button>
+      <button class="btn-secondary" id="btn-exit-game" style="padding:6px 12px;font-size:0.82rem;">Exit</button>
+    </div>
+  </div>
+
+  <div class="combo-bar-wrap">
+    <div class="combo-fill" id="question-timer-bar"></div>
+  </div>
+
+  <div class="question-card">
+    <div class="question-prompt" id="q-prompt">Number Series</div>
+    <div class="question-main" id="q-content">4, 8, 16, 32, ?</div>
+  </div>
+
+  <div class="options-grid" id="options-container">
+    <!-- 4 Options -->
+  </div>
+</div>
+
+<!-- Time Up Modal -->
+<div class="modal-overlay-game" id="modal-game-over">
+  <div class="modal-content" style="max-width:440px;text-align:center;padding:32px;">
+    <div style="font-size:2.8rem;margin-bottom:8px;">⚡</div>
+    <h3 style="font-size:1.5rem;font-weight:700;margin-bottom:6px;">Sprint Completed!</h3>
+    <p style="color:var(--text-muted);font-size:0.9rem;margin-bottom:20px;">
+      Incredible processing speed and numerical accuracy demonstrated!
+    </p>
+    <div style="background:rgba(255,255,255,0.05);padding:16px;border-radius:12px;margin-bottom:24px;">
+      <div style="font-size:2rem;font-weight:800;color:var(--accent-blue);" id="final-score-val">0</div>
+      <div style="font-size:0.82rem;color:var(--text-muted);">Points Earned</div>
+      <div style="margin-top:8px;font-size:0.88rem;color:var(--accent-teal);" id="final-accuracy-val">Accuracy: 100%</div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      <button class="btn-primary" id="btn-save-and-exit" style="width:100%;padding:12px;">💾 Save Score & Return to App</button>
+      <button class="btn-secondary" id="btn-keep-playing" style="width:100%;padding:12px;">🎮 Keep Playing (Casual Mode)</button>
+    </div>
+  </div>
+</div>
+
+<!-- Instructions Modal -->
+<div class="modal-overlay-game" id="modal-instructions">
+  <div class="modal-content" style="max-width:480px;padding:28px;">
+    <h3 style="margin-bottom:12px;">How to Play NeuroSprint</h3>
+    <ul style="color:var(--text-muted);font-size:0.9rem;line-height:1.6;margin-left:20px;margin-bottom:20px;">
+      <li>Answer rapid-fire math, sequence, and logic challenges under time pressure.</li>
+      <li>Each question has a quick countdown bar. Fast answers score higher combo bonuses!</li>
+      <li>Maintain consecutive correct answers to multiply your streak multiplier.</li>
+      <li>Never forced to exit when session timer ends — continue in casual mode anytime.</li>
+    </ul>
+    <button class="btn-primary" id="btn-close-instructions" style="width:100%;padding:10px;">Sprint Now</button>
+  </div>
+</div>
+
+<script type="module">
+  import { apiRequest } from '/static/js/api.js';
+
+  const urlParams = new URLSearchParams(window.location.search);
+  let sessionMinutes = parseInt(urlParams.get('duration') || 5);
+  let timeRemaining = sessionMinutes * 60;
+  let score = 0;
+  let streak = 0;
+  let totalAnswered = 0;
+  let totalCorrect = 0;
+  let isCasualMode = false;
+
+  let currentQuestion = null;
+  let questionTimer = null;
+  let questionTimeLeft = 100;
+
+  function initGame() {
+    startSessionTimer();
+    nextQuestion();
+
+    document.getElementById('btn-show-instructions').onclick = () => document.getElementById('modal-instructions').classList.add('active');
+    document.getElementById('btn-close-instructions').onclick = () => document.getElementById('modal-instructions').classList.remove('active');
+    document.getElementById('btn-exit-game').onclick = () => { if (confirm('Exit NeuroSprint?')) window.close(); };
+    document.getElementById('btn-keep-playing').onclick = () => {
+      document.getElementById('modal-game-over').classList.remove('active');
+      isCasualMode = true;
+      document.getElementById('game-timer').textContent = 'Casual Mode ♾️';
+    };
+    document.getElementById('btn-save-and-exit').onclick = async () => {
+      await saveScoreToDb();
+      window.close();
+    };
+  }
+
+  function generateQuestion() {
+    const types = ['sequence', 'arithmetic', 'logic'];
+    const type = types[Math.floor(Math.random() * types.length)];
+
+    if (type === 'sequence') {
+      const step = Math.floor(Math.random() * 5) + 2;
+      const start = Math.floor(Math.random() * 10) + 1;
+      const isMult = Math.random() > 0.5;
+      let seq = [];
+      let cur = start;
+      for (let i = 0; i < 4; i++) {
+        seq.push(cur);
+        cur = isMult ? cur * 2 : cur + step;
+      }
+      const answer = cur;
+      const distractors = [answer + step, answer - step, answer + (isMult ? 4 : 2)].filter(x => x !== answer && x > 0);
+      return {
+        prompt: isMult ? 'Geometric Series' : 'Arithmetic Progression',
+        content: `${seq.join(', ')}, ?`,
+        answer: answer.toString(),
+        options: shuffle([answer.toString(), ...distractors.slice(0, 3).map(String)])
+      };
+    } else if (type === 'arithmetic') {
+      const a = Math.floor(Math.random() * 40) + 10;
+      const b = Math.floor(Math.random() * 30) + 5;
+      const op = Math.random() > 0.5 ? '+' : '-';
+      const ans = op === '+' ? a + b : a - b;
+      return {
+        prompt: 'Rapid Calculation',
+        content: `${a} ${op} ${b} = ?`,
+        answer: ans.toString(),
+        options: shuffle([ans.toString(), (ans + 10).toString(), (ans - 5).toString(), (ans + 2).toString()])
+      };
+    } else {
+      const num = 12 * (Math.floor(Math.random() * 4) + 1);
+      return {
+        prompt: 'Divisibility Logic',
+        content: `Divisible by both 3 and 4:`,
+        answer: num.toString(),
+        options: shuffle([num.toString(), (num + 5).toString(), (num + 7).toString(), (num - 2).toString()])
+      };
+    }
+  }
+
+  function shuffle(arr) {
+    return [...arr].sort(() => Math.random() - 0.5);
+  }
+
+  function nextQuestion() {
+    currentQuestion = generateQuestion();
+    document.getElementById('q-prompt').textContent = currentQuestion.prompt;
+    document.getElementById('q-content').textContent = currentQuestion.content;
+
+    const container = document.getElementById('options-container');
+    container.innerHTML = currentQuestion.options.map(opt => `
+      <button class="option-btn" data-val="${opt}">${opt}</button>
+    `).join('');
+
+    container.querySelectorAll('.option-btn').forEach(btn => {
+      btn.onclick = () => handleAnswer(btn.dataset.val);
+    });
+
+    // Reset bar
+    clearInterval(questionTimer);
+    questionTimeLeft = 100;
+    const bar = document.getElementById('question-timer-bar');
+    bar.style.width = '100%';
+
+    questionTimer = setInterval(() => {
+      questionTimeLeft -= 1.6;
+      bar.style.width = `${Math.max(0, questionTimeLeft)}%`;
+      if (questionTimeLeft <= 0) {
+        clearInterval(questionTimer);
+        handleAnswer(null); // Timeout
+      }
+    }, 100);
+  }
+
+  function handleAnswer(selected) {
+    clearInterval(questionTimer);
+    totalAnswered++;
+    const isCorrect = selected === currentQuestion.answer;
+    const btns = document.querySelectorAll('.option-btn');
+
+    btns.forEach(b => {
+      b.disabled = true;
+      if (b.dataset.val === currentQuestion.answer) b.classList.add('correct');
+      if (b.dataset.val === selected && !isCorrect) b.classList.add('wrong');
+    });
+
+    if (isCorrect) {
+      totalCorrect++;
+      streak++;
+      const timeBonus = Math.round(questionTimeLeft);
+      const points = 100 + (streak * 20) + timeBonus;
+      score += points;
+      document.getElementById('game-score').textContent = `Score: ${score}`;
+      document.getElementById('game-streak').textContent = `🔥 ${streak}x`;
+    } else {
+      streak = 0;
+      document.getElementById('game-streak').textContent = `🔥 0x`;
+    }
+
+    setTimeout(nextQuestion, 800);
+  }
+
+  function startSessionTimer() {
+    const timerEl = document.getElementById('game-timer');
+    const interval = setInterval(() => {
+      if (isCasualMode) return;
+      timeRemaining--;
+      const mins = Math.floor(timeRemaining / 60);
+      const secs = timeRemaining % 60;
+      timerEl.textContent = `⏱ ${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+      if (timeRemaining <= 0) {
+        clearInterval(interval);
+        handleTimeUp();
+      }
+    }, 1000);
+  }
+
+  function handleTimeUp() {
+    clearInterval(questionTimer);
+    const accuracy = totalAnswered > 0 ? Math.round((totalCorrect / totalAnswered) * 100) : 100;
+    document.getElementById('final-score-val').textContent = score.toLocaleString();
+    document.getElementById('final-accuracy-val').textContent = `Accuracy: ${accuracy}% (${totalCorrect}/${totalAnswered} solved)`;
+    document.getElementById('modal-game-over').classList.add('active');
+    saveScoreToDb();
+  }
+
+  async function saveScoreToDb() {
+    const accuracy = totalAnswered > 0 ? Math.round((totalCorrect / totalAnswered) * 100) : 100;
+    try {
+      await apiRequest('/games/scores', 'POST', {
+        game_id: 'neurosprint',
+        score,
+        level_reached: Math.max(1, Math.floor(score / 500)),
+        duration_sec: sessionMinutes * 60,
+        accuracy
+      });
+    } catch (err) {
+      console.warn('Score save notice:', err);
+    }
+  }
+
+  window.onload = initGame;
+</script>
+</body>
+</html>

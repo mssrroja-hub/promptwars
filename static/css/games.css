@@ -1,0 +1,196 @@
+/* ==========================================================================
+   MennilNexus AI — MentiExercise / Energy Hub Styles (Pastel Theme)
+   ========================================================================== */
+
+.games-hero {
+  background: linear-gradient(135deg, #F3ECFF 0%, #E8F5FF 50%, #FFF0F6 100%);
+  border: 1.5px solid var(--pastel-lavender-border);
+  border-radius: var(--radius-xl);
+  padding: 34px 38px;
+  margin-bottom: 28px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--shadow-card);
+}
+
+.games-hero h2 {
+  font-size: 1.95rem;
+  font-weight: 800;
+  color: var(--text-main);
+  margin-bottom: 6px;
+}
+
+.games-hero p {
+  color: var(--text-muted);
+  max-width: 650px;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+/* Session Duration Selector */
+.session-timer-selector {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 20px;
+  flex-wrap: wrap;
+}
+.session-timer-selector span {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text-main);
+}
+.duration-chips {
+  display: flex;
+  gap: 8px;
+}
+.duration-chip {
+  padding: 8px 18px;
+  background: #FFFFFF;
+  border: 1.5px solid var(--pastel-lavender-border);
+  border-radius: var(--radius-full);
+  color: var(--text-muted);
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: var(--transition-smooth);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+}
+.duration-chip:hover {
+  border-color: var(--accent-purple);
+  color: var(--accent-purple);
+}
+.duration-chip.active {
+  background: var(--accent-purple);
+  border-color: var(--accent-purple);
+  color: #FFFFFF;
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.25);
+}
+
+/* 4 Games Grid */
+.games-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 24px;
+  margin-bottom: 36px;
+}
+
+.game-card {
+  background: #FFFFFF;
+  border: 1.5px solid var(--border-subtle);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: var(--transition-smooth);
+  box-shadow: var(--shadow-card);
+}
+.game-card:hover {
+  border-color: var(--accent-purple);
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-hover);
+}
+
+.game-card-banner {
+  height: 140px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+.game-card-banner.matrix {
+  background: linear-gradient(135deg, #F3ECFF, #E9DFFF);
+}
+.game-card-banner.memory {
+  background: linear-gradient(135deg, #EEFDF5, #D9F8E8);
+}
+.game-card-banner.neurosprint {
+  background: linear-gradient(135deg, #EEF8FF, #DDF2FF);
+}
+.game-card-banner.stardash {
+  background: linear-gradient(135deg, #FFF0F5, #FFE0ED);
+}
+
+.game-banner-icon {
+  width: 68px;
+  height: 68px;
+  border-radius: var(--radius-lg);
+  background: #FFFFFF;
+  border: 2px solid rgba(255, 255, 255, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.2rem;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.05);
+}
+
+.game-card-body {
+  padding: 24px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.game-category-tag {
+  font-size: 0.76rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--accent-purple);
+  margin-bottom: 6px;
+}
+
+.game-title {
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: var(--text-main);
+  margin-bottom: 8px;
+}
+
+.game-desc {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+  margin-bottom: 18px;
+  flex: 1;
+}
+
+.game-card-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 0;
+  border-top: 1.5px solid var(--border-subtle);
+  border-bottom: 1.5px solid var(--border-subtle);
+  margin-bottom: 18px;
+  font-size: 0.86rem;
+  color: var(--text-muted);
+}
+
+.game-card-meta .personal-best {
+  font-weight: 800;
+  color: var(--accent-purple);
+}
+
+.btn-launch-game {
+  width: 100%;
+  padding: 12px;
+  background: var(--pastel-lavender-light);
+  border: 1.5px solid var(--pastel-lavender-border);
+  border-radius: var(--radius-md);
+  color: var(--accent-purple);
+  font-weight: 800;
+  font-size: 0.94rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: var(--transition-smooth);
+}
+.btn-launch-game:hover {
+  background: linear-gradient(135deg, #8B5CF6, #7C3AED);
+  border-color: var(--accent-purple);
+  color: #FFFFFF;
+  box-shadow: 0 4px 16px rgba(139, 92, 246, 0.3);
+  transform: translateY(-1px);
+}

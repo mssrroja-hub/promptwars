@@ -1,0 +1,911 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="MennilNexus AI — Pastel, brain-training, and energy-focused productivity platform with intelligent scheduling, calendar, and cognitive fitness games.">
+  <title>MennilNexus AI — Intelligent Productivity & Mental Fitness</title>
+
+  <!-- Google Fonts: Outfit (Headings), Inter & Plus Jakarta Sans (Body & Data) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Core Pastel Design System & Component Stylesheets -->
+  <link rel="stylesheet" href="/static/css/main.css">
+  <link rel="stylesheet" href="/static/css/auth.css">
+  <link rel="stylesheet" href="/static/css/dashboard.css">
+  <link rel="stylesheet" href="/static/css/ai_assistant.css">
+  <link rel="stylesheet" href="/static/css/tasks.css">
+  <link rel="stylesheet" href="/static/css/calendar.css">
+  <link rel="stylesheet" href="/static/css/games.css">
+  <link rel="stylesheet" href="/static/css/insights.css">
+  <link rel="stylesheet" href="/static/css/settings.css">
+</head>
+<body>
+
+  <!-- =====================================================================
+       1. AUTHENTICATION & WELCOME SCREEN (PASTEL THEME)
+       Dynamic Registration & Login (No hardcoded accounts)
+       ===================================================================== -->
+  <div id="auth-screen">
+    <div class="auth-card">
+      <div class="auth-brand">
+        <div class="auth-logo-badge">🧠</div>
+        <h1>MennilNexus AI</h1>
+        <div class="auth-tagline">Let's make today count.</div>
+      </div>
+
+      <div class="auth-tabs">
+        <button class="auth-tab-btn active" id="tab-btn-login">Log In</button>
+        <button class="auth-tab-btn" id="tab-btn-signup">Sign Up</button>
+      </div>
+
+      <div class="auth-alert" id="auth-alert"></div>
+
+      <!-- Log In Form -->
+      <form class="auth-form" id="form-login">
+        <div class="form-group">
+          <label for="login-email">Email Address</label>
+          <input type="email" id="login-email" placeholder="you@university.edu" required autocomplete="email">
+        </div>
+        <div class="form-group">
+          <label for="login-password">
+            <span>Password</span>
+            <span class="hint">4 characters</span>
+          </label>
+          <input type="password" id="login-password" placeholder="••••" maxlength="4" required autocomplete="current-password">
+        </div>
+        <button type="submit" class="btn-auth-submit" id="btn-submit-login">Log In to MennilNexus</button>
+        <div class="auth-footer-links">
+          <button type="button" id="btn-forgot-password">Forgot password?</button>
+          <span style="color:var(--text-subtle);font-size:0.8rem;">Secure Salted Hash</span>
+        </div>
+      </form>
+
+      <!-- Sign Up Form -->
+      <form class="auth-form" id="form-signup" style="display: none;">
+        <div class="form-group">
+          <label for="signup-name">Full Name</label>
+          <input type="text" id="signup-name" placeholder="Alex Morgan" required autocomplete="name">
+        </div>
+        <div class="form-group">
+          <label for="signup-email">Email Address</label>
+          <input type="email" id="signup-email" placeholder="alex@university.edu" required autocomplete="email">
+        </div>
+        <div class="form-group">
+          <label for="signup-password">
+            <span>Password</span>
+            <span class="password-rule-pill">Exactly 4 characters</span>
+          </label>
+          <input type="password" id="signup-password" placeholder="••••" maxlength="4" required autocomplete="new-password">
+        </div>
+        <div class="form-group">
+          <label for="signup-confirm">Confirm Password</label>
+          <input type="password" id="signup-confirm" placeholder="••••" maxlength="4" required autocomplete="new-password">
+        </div>
+        <button type="submit" class="btn-auth-submit" id="btn-submit-signup">Create My Account</button>
+        <div style="font-size:0.75rem;color:var(--text-subtle);text-align:center;margin-top:6px;">
+          *Prototype requirement: 4-character password enforced server-side.
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Account Recovery / Password Reset Modal -->
+  <div class="modal-overlay" id="modal-recovery">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Account Recovery</h3>
+        <button class="modal-close-btn" onclick="document.getElementById('modal-recovery').classList.remove('active')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="form-recovery-request" style="display:flex;flex-direction:column;gap:14px;">
+          <p style="font-size:0.88rem;color:var(--text-muted);">
+            Enter your registered email address. Since an external SMTP server is not configured in this prototype, a verification code will be generated on-screen.
+          </p>
+          <div class="form-group">
+            <label for="recovery-email">Email Address</label>
+            <input type="email" id="recovery-email" required>
+          </div>
+          <button type="submit" class="btn-primary" style="width:100%;padding:12px;">Generate Recovery Code</button>
+        </form>
+
+        <div id="recovery-notice" style="display:none;background:#EDFDF5;border:1.5px solid var(--pastel-mint-border);padding:14px;border-radius:12px;margin-bottom:14px;"></div>
+
+        <form id="form-recovery-reset" style="display:none;flex-direction:column;gap:14px;">
+          <input type="hidden" id="reset-email-hidden">
+          <div class="form-group">
+            <label for="reset-code">Recovery Code</label>
+            <input type="text" id="reset-code" required>
+          </div>
+          <div class="form-group">
+            <label for="reset-password">
+              <span>New Password</span>
+              <span class="password-rule-pill">Exactly 4 characters</span>
+            </label>
+            <input type="password" id="reset-password" maxlength="4" required>
+          </div>
+          <div class="form-group">
+            <label for="reset-confirm">Confirm New Password</label>
+            <input type="password" id="reset-confirm" maxlength="4" required>
+          </div>
+          <button type="submit" class="btn-primary" style="width:100%;padding:12px;">Save New Password</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- =====================================================================
+       2. MASTER APPLICATION CONTAINER & PASTEL SIDEBAR NAVIGATION
+       ===================================================================== -->
+  <div id="app-container">
+    <!-- Sidebar Navigation -->
+    <aside id="sidebar">
+      <div class="brand-header">
+        <div class="brand-icon">
+          <span>🧠</span>
+        </div>
+        <div class="brand-info">
+          <h2>MennilNexus AI</h2>
+          <div class="brand-tagline">Let's make today count.</div>
+        </div>
+      </div>
+
+      <ul class="nav-menu">
+        <li class="nav-item active" id="nav-item-dashboard">
+          <button id="btn-nav-dashboard">
+            <span class="nav-icon">🏠</span>
+            Dashboard
+          </button>
+        </li>
+        <li class="nav-item" id="nav-item-ai">
+          <button id="btn-nav-ai">
+            <span class="nav-icon">🧠</span>
+            AI Assistant
+          </button>
+        </li>
+        <li class="nav-item" id="nav-item-tasks">
+          <button id="btn-nav-tasks">
+            <span class="nav-icon">📅</span>
+            Tasks & Schedules
+          </button>
+        </li>
+        <li class="nav-item" id="nav-item-calendar">
+          <button id="btn-nav-calendar">
+            <span class="nav-icon">🗓️</span>
+            Calendar
+          </button>
+        </li>
+        <li class="nav-item" id="nav-item-games">
+          <button id="btn-nav-games">
+            <span class="nav-icon">⚡</span>
+            Productivity / Energy Hub
+          </button>
+        </li>
+        <li class="nav-item" id="nav-item-insights">
+          <button id="btn-nav-insights">
+            <span class="nav-icon">📊</span>
+            Insights
+          </button>
+        </li>
+        <li class="nav-item" id="nav-item-settings">
+          <button id="btn-nav-settings">
+            <span class="nav-icon">⚙️</span>
+            Settings & Privacy
+          </button>
+        </li>
+      </ul>
+
+      <!-- Authenticated User Profile Area (Never hardcoded) -->
+      <div class="sidebar-footer">
+        <div class="user-mini-profile">
+          <div class="user-avatar" id="sidebar-user-avatar">U</div>
+          <div class="user-meta">
+            <span class="name" id="sidebar-user-name">User</span>
+            <span class="email" id="sidebar-user-email">user@mentinous.ai</span>
+          </div>
+        </div>
+        <button class="logout-icon-btn" id="btn-sidebar-logout" title="Log Out">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main Content Viewport -->
+    <main id="main-viewport">
+      <!-- Sticky Top Navbar -->
+      <header class="top-navbar">
+        <div class="navbar-left">
+          <button id="btn-mobile-menu-toggle" style="background:transparent;color:var(--text-muted);display:none;font-size:1.4rem;">☰</button>
+          <h1 class="page-title" id="navbar-page-title">Dashboard</h1>
+        </div>
+        <div class="navbar-actions">
+          <button class="btn-primary" id="btn-nav-add-task">
+            <span>+</span> Add Task
+          </button>
+          <button class="notification-btn" id="btn-notification-bell" title="Notifications & Missed-Task Check-ins">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+            <span class="notification-badge" id="notification-badge"></span>
+          </button>
+        </div>
+
+        <!-- Notification Dropdown -->
+        <div class="notification-dropdown" id="notification-dropdown">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;padding-bottom:8px;border-bottom:1.5px solid var(--border-subtle);">
+            <strong style="font-size:0.95rem;color:var(--text-main);">🔔 Task Reminders & Alerts</strong>
+            <span style="font-size:0.75rem;color:var(--accent-purple);font-weight:700;">Quiet Hours Active</span>
+          </div>
+          <div id="notif-dropdown-list">
+            <!-- Populated dynamically -->
+          </div>
+        </div>
+      </header>
+
+      <!-- ===================================================================
+           VIEW 1: REDESIGNED PASTEL, BRAIN & ENERGY DASHBOARD
+           =================================================================== -->
+      <section class="view-container active" id="view-dashboard">
+        <!-- Welcome Banner with Cute Brain & Lightning Mascots -->
+        <div class="dashboard-hero">
+          <div class="hero-content-left">
+            <div class="hero-welcome-badge">Better Focus, Bigger Goals 💜</div>
+            <h2 class="hero-title" id="dashboard-user-greeting">Welcome back! 👋</h2>
+            <div class="hero-tagline">Let's make today count.</div>
+            <p class="hero-description">
+              Your neural fitness companion is active and ready to supercharge your productivity, energy, and learning today.
+            </p>
+          </div>
+          <div class="hero-mascot-wrap">
+            <img src="/static/images/brain-energy-mascots.svg" alt="Brain & Energy Mascots" class="hero-mascot-img">
+          </div>
+        </div>
+
+        <!-- 4 Pastel Productivity Statistics Cards Grid -->
+        <div class="metrics-grid">
+          <!-- Card 1 — Today's Progress 🌱 (Mint Green) -->
+          <div class="metric-card card-mint">
+            <div class="metric-card-top">
+              <span class="metric-label-title">Today's Progress 🌱</span>
+              <div class="metric-icon-bubble">🌱</div>
+            </div>
+            <div class="metric-main-value" id="stat-progress-val">0%</div>
+            <div class="metric-mini-progress">
+              <div class="metric-mini-fill" id="dashboard-progress-mini-fill"></div>
+            </div>
+            <div class="metric-card-footer">
+              <span>Keep going! You’ve got this.</span>
+            </div>
+          </div>
+
+          <!-- Card 2 — Focus Scheduled 🧠 (Lavender) -->
+          <div class="metric-card card-lavender">
+            <div class="metric-card-top">
+              <span class="metric-label-title">Focus Scheduled 🧠</span>
+              <div class="metric-icon-bubble">🧠</div>
+            </div>
+            <div class="metric-main-value" id="stat-focus-hours">0.0 hrs</div>
+            <div class="metric-card-footer">
+              <span>Build your best self.</span>
+            </div>
+          </div>
+
+          <!-- Card 3 — Urgent Deadlines 🚀 (Peach) -->
+          <div class="metric-card card-peach">
+            <div class="metric-card-top">
+              <span class="metric-label-title">Urgent Deadlines 🚀</span>
+              <div class="metric-icon-bubble">🚀</div>
+            </div>
+            <div class="metric-main-value" id="stat-deadlines-count">0</div>
+            <div class="metric-card-footer">
+              <span>Stay ahead of your goals.</span>
+            </div>
+          </div>
+
+          <!-- Card 4 — MennilNexus Hub 🎮 (Baby Blue) -->
+          <div class="metric-card card-blue">
+            <div class="metric-card-top">
+              <span class="metric-label-title">MennilNexus Hub 🎮</span>
+              <div class="metric-icon-bubble">🎮</div>
+            </div>
+            <div class="metric-main-value" id="stat-games-count">4 Games</div>
+            <div class="metric-card-footer">
+              <span>Play · Learn · Grow.</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Dashboard Two-Column Layout -->
+        <div class="dashboard-main-grid">
+          <div>
+            <!-- Immediate Priority ⚡ Section -->
+            <div class="content-card immediate-priority-panel" style="margin-bottom:24px;">
+              <div class="content-card-header">
+                <h3>⚡ Immediate Priority</h3>
+                <button class="btn-text-action" id="btn-view-all-priority">View All &rarr;</button>
+              </div>
+              <div id="next-up-container">
+                <!-- Populated dynamically with urgent task card or friendly empty state -->
+              </div>
+            </div>
+
+            <!-- Today's Task Plan 📋 Section -->
+            <div class="content-card task-plan-card">
+              <div class="task-plan-header">
+                <h3>📋 Today's Task Plan</h3>
+                <span class="task-plan-count-badge" id="stat-completed-label">0 of 0 tasks finished</span>
+              </div>
+
+              <!-- Today Progress Track -->
+              <div class="progress-card-bar-wrap">
+                <div class="progress-track">
+                  <div class="progress-fill" id="dashboard-progress-fill"></div>
+                </div>
+              </div>
+
+              <!-- Quick Add Bar -->
+              <div class="quick-add-task-bar">
+                <input type="text" id="quick-add-input" placeholder="Quickly add a task for today (e.g. 'Review Physics notes')...">
+                <button class="btn-primary btn-quick-add" id="btn-quick-add">+ Add Task</button>
+              </div>
+
+              <div id="dashboard-task-list">
+                <!-- Task list loaded dynamically -->
+              </div>
+            </div>
+          </div>
+
+          <!-- Secondary Column: Mental Fitness Panel 💗 -->
+          <div>
+            <div class="content-card mental-fitness-card">
+              <div class="content-card-header">
+                <h3>Mental Fitness 💗</h3>
+                <button class="btn-text-action" onclick="document.getElementById('btn-nav-games').click()">Open Hub &rarr;</button>
+              </div>
+              <p class="mental-fitness-intro">
+                Sharpen cognition, improve focus, and build healthy mental habits with engaging brain-training games.
+              </p>
+
+              <div class="game-cards-stack">
+                <!-- Game 1: Matrix Master -->
+                <div class="fitness-game-card theme-lavender">
+                  <div class="game-icon-avatar">🧩</div>
+                  <div class="game-info-block">
+                    <div class="game-name-title">Matrix Master</div>
+                    <div class="game-short-desc">Pattern & spatial reasoning</div>
+                    <div class="game-score-tag" id="dash-pb-matrix">🏆 Best: 0 pts</div>
+                  </div>
+                  <button class="btn-play-game-action" onclick="window.open('/game/matrix-master?duration=5', '_blank')">
+                    Play Now &rarr;
+                  </button>
+                </div>
+
+                <!-- Game 2: Memory Shift -->
+                <div class="fitness-game-card theme-mint">
+                  <div class="game-icon-avatar">🧠</div>
+                  <div class="game-info-block">
+                    <div class="game-name-title">Memory Shift</div>
+                    <div class="game-short-desc">Working memory & reverse recall</div>
+                    <div class="game-score-tag" id="dash-pb-memory">🏆 Best: 0 pts</div>
+                  </div>
+                  <button class="btn-play-game-action" onclick="window.open('/game/memory-shift?duration=5', '_blank')">
+                    Play Now &rarr;
+                  </button>
+                </div>
+
+                <!-- Game 3: NeuroSprint -->
+                <div class="fitness-game-card theme-blue">
+                  <div class="game-icon-avatar">⚡</div>
+                  <div class="game-info-block">
+                    <div class="game-name-title">NeuroSprint</div>
+                    <div class="game-short-desc">Rapid arithmetic & fluid logic</div>
+                    <div class="game-score-tag" id="dash-pb-neurosprint">🏆 Best: 0 pts</div>
+                  </div>
+                  <button class="btn-play-game-action" onclick="window.open('/game/neurosprint?duration=5', '_blank')">
+                    Play Now &rarr;
+                  </button>
+                </div>
+
+                <!-- Game 4: Minty's Star Dash -->
+                <div class="fitness-game-card theme-peach">
+                  <div class="game-icon-avatar">🚀</div>
+                  <div class="game-info-block">
+                    <div class="game-name-title">Minty's Star Dash</div>
+                    <div class="game-short-desc">Reflex & visual coordination</div>
+                    <div class="game-score-tag" id="dash-pb-stardash">🏆 Best: 0 pts</div>
+                  </div>
+                  <button class="btn-play-game-action" onclick="window.open('/game/star-dash?duration=5', '_blank')">
+                    Play Now &rarr;
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Daily Reflection Callout Card -->
+            <div class="content-card" style="background: linear-gradient(135deg, #FAF8FF 0%, #FFFFFF 100%); border: 1.5px solid var(--pastel-lavender-border);">
+              <div class="content-card-header">
+                <h3>Daily Reflection 📊</h3>
+              </div>
+              <p style="font-size:0.88rem;color:var(--text-muted);margin-bottom:16px;">
+                Review your accomplishments and celebrate your focus with compassionate, honest metrics.
+              </p>
+              <button class="btn-primary" onclick="document.getElementById('btn-nav-insights').click()" style="width:100%;justify-content:center;">
+                Open End-of-Day Review
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===================================================================
+           VIEW 2: AI ASSISTANT & SCHEDULING
+           =================================================================== -->
+      <section class="view-container" id="view-ai">
+        <div class="ai-container">
+          <div class="ai-header-card">
+            <div>
+              <h2 style="font-size:1.25rem;">Intelligent Schedule Optimizer</h2>
+              <p style="font-size:0.85rem;color:var(--text-muted);">
+                Describe your daily commitments and tasks naturally. The AI detects fixed blocks, deadlines, and conflicts to construct a balanced plan.
+              </p>
+            </div>
+            <span class="ai-badge">Deterministic Neural-Heuristic Planner (Built-in)</span>
+          </div>
+
+          <div class="ai-conversation-area" id="ai-chat-conversation">
+            <div class="chat-bubble ai">
+              Hello! I'm your MentiNous AI scheduling assistant. Tell me about your day using text or voice.<br><br>
+              <strong>Example prompt:</strong><br>
+              <em>"I have college until 3 PM, two hours of Java practice, and a project deadline tomorrow."</em>
+            </div>
+          </div>
+
+          <!-- Input Bar -->
+          <div class="ai-input-bar">
+            <button class="voice-btn" id="btn-ai-voice" title="Speak Schedule (Web Speech API)">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+            </button>
+            <textarea id="ai-text-input" placeholder="Type or speak: 'I have college until 3 PM, two hours of Java practice, and a project deadline tomorrow.'"></textarea>
+            <button class="send-btn" id="btn-ai-send" title="Send Request">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===================================================================
+           VIEW 3: TASKS & SCHEDULE
+           =================================================================== -->
+      <section class="view-container" id="view-tasks">
+        <div class="tasks-toolbar">
+          <div class="filter-pills">
+            <button class="filter-pill active" data-filter="all">All Tasks</button>
+            <button class="filter-pill" data-filter="today">Today</button>
+            <button class="filter-pill" data-filter="upcoming">Upcoming</button>
+            <button class="filter-pill" data-filter="completed">Completed</button>
+            <button class="filter-pill" data-filter="high">High Priority</button>
+          </div>
+          <button class="btn-primary" id="btn-open-add-task">+ Add Task</button>
+        </div>
+
+        <div class="task-list" id="tasks-view-list">
+          <!-- Populated dynamically -->
+        </div>
+      </section>
+
+      <!-- ===================================================================
+           VIEW 4: CALENDAR
+           =================================================================== -->
+      <section class="view-container" id="view-calendar">
+        <div class="calendar-header">
+          <div class="calendar-nav">
+            <h2 id="cal-display-title">October 2026</h2>
+            <button class="cal-nav-btn" id="cal-btn-prev">&lt;</button>
+            <button class="cal-nav-btn" id="cal-btn-today" style="width:auto;padding:0 12px;font-size:0.8rem;">Today</button>
+            <button class="cal-nav-btn" id="cal-btn-next">&gt;</button>
+          </div>
+          <div class="view-mode-selector">
+            <button class="view-mode-btn active" data-mode="month">Month</button>
+            <button class="view-mode-btn" data-mode="week">Week</button>
+            <button class="view-mode-btn" data-mode="day">Day</button>
+          </div>
+        </div>
+
+        <div id="calendar-grid-container">
+          <!-- Grid rendered dynamically -->
+        </div>
+      </section>
+
+      <!-- ===================================================================
+           VIEW 5: MENTIEXERCISE
+           =================================================================== -->
+      <section class="view-container" id="view-games">
+        <div class="games-hero">
+          <h2>🧠 MentiExercise Hub</h2>
+          <p>
+            Engage your brain with 4 targeted mental fitness exercises. Choose your session duration and launch any game in a dedicated focused window.
+          </p>
+
+          <div class="session-timer-selector">
+            <span>Target Session Length:</span>
+            <div class="duration-chips">
+              <button class="duration-chip" data-duration="2">2 Minutes</button>
+              <button class="duration-chip active" data-duration="5">5 Minutes (Default)</button>
+              <button class="duration-chip" data-duration="10">10 Minutes</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4 Games Grid -->
+        <div class="games-grid">
+          <!-- 1. Matrix Master -->
+          <div class="game-card">
+            <div class="game-card-banner matrix">
+              <div class="game-banner-icon">🧩</div>
+            </div>
+            <div class="game-card-body">
+              <div class="game-category-tag">Pattern Reasoning</div>
+              <h3 class="game-title">Matrix Master</h3>
+              <p class="game-desc">
+                Analyze 3x3 geometric matrices, detect underlying rotational and numerical transformations, and identify missing patterns.
+              </p>
+              <div class="game-card-meta">
+                <span>Personal Best</span>
+                <span class="personal-best" id="pb-matrix-master">0 pts</span>
+              </div>
+              <button class="btn-launch-game" data-game="matrix-master">
+                Play Matrix Master &rarr;
+              </button>
+            </div>
+          </div>
+
+          <!-- 2. Memory Shift -->
+          <div class="game-card">
+            <div class="game-card-banner memory">
+              <div class="game-banner-icon">🔄</div>
+            </div>
+            <div class="game-card-body">
+              <div class="game-category-tag">Working Memory</div>
+              <h3 class="game-title">Memory Shift</h3>
+              <p class="game-desc">
+                Memorize flashing numeric sequences and rapidly shift between forward recall and reverse-order working memory challenges.
+              </p>
+              <div class="game-card-meta">
+                <span>Personal Best</span>
+                <span class="personal-best" id="pb-memory-shift">0 pts</span>
+              </div>
+              <button class="btn-launch-game" data-game="memory-shift">
+                Play Memory Shift &rarr;
+              </button>
+            </div>
+          </div>
+
+          <!-- 3. NeuroSprint -->
+          <div class="game-card">
+            <div class="game-card-banner neurosprint">
+              <div class="game-banner-icon">⚡</div>
+            </div>
+            <div class="game-card-body">
+              <div class="game-category-tag">Rapid Math & Logic</div>
+              <h3 class="game-title">NeuroSprint</h3>
+              <p class="game-desc">
+                Speed-run through arithmetic sequences, logic inequalities, and rapid deductions under intense countdown pressure.
+              </p>
+              <div class="game-card-meta">
+                <span>Personal Best</span>
+                <span class="personal-best" id="pb-neurosprint">0 pts</span>
+              </div>
+              <button class="btn-launch-game" data-game="neurosprint">
+                Play NeuroSprint &rarr;
+              </button>
+            </div>
+          </div>
+
+          <!-- 4. Minty's Star Dash -->
+          <div class="game-card">
+            <div class="game-card-banner stardash">
+              <div class="game-banner-icon">🚀</div>
+            </div>
+            <div class="game-card-body">
+              <div class="game-category-tag">Reflex & Tracking</div>
+              <h3 class="game-title">Minty's Star Dash</h3>
+              <p class="game-desc">
+                Pilot a nimble cosmic runner across hyperspace! Gather radiant energy stars and dodge oncoming asteroid hazards.
+              </p>
+              <div class="game-card-meta">
+                <span>Personal Best</span>
+                <span class="personal-best" id="pb-star-dash">0 pts</span>
+              </div>
+              <button class="btn-launch-game" data-game="star-dash">
+                Play Star Dash &rarr;
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent Training History -->
+        <div class="content-card">
+          <div class="content-card-header">
+            <h3>Recent Mental Fitness Sessions</h3>
+          </div>
+          <div id="recent-game-history">
+            <!-- Populated dynamically -->
+          </div>
+        </div>
+      </section>
+
+      <!-- ===================================================================
+           VIEW 6: INSIGHTS & END-OF-DAY REVIEW
+           =================================================================== -->
+      <section class="view-container" id="view-insights">
+        <div class="insights-header">
+          <h2 style="font-size:1.6rem;font-weight:700;margin-bottom:4px;">End-of-Day Review & Productivity Insights</h2>
+          <p style="color:var(--text-muted);font-size:0.9rem;">
+            Real task analytics and reflective summaries derived directly from your database records.
+          </p>
+        </div>
+
+        <div class="eod-review-card">
+          <div class="supportive-banner" id="eod-supportive-text">
+            Great effort today! Every focused minute builds meaningful momentum.
+          </div>
+
+          <div class="review-breakdown-grid">
+            <div class="review-stat-pill">
+              <div class="num completed" id="eod-completed-count">0</div>
+              <div class="label">Completed Tasks</div>
+            </div>
+            <div class="review-stat-pill">
+              <div class="num unfinished" id="eod-unfinished-count">0</div>
+              <div class="label">Unfinished Tasks</div>
+            </div>
+            <div class="review-stat-pill">
+              <div class="num postponed" id="eod-postponed-count">0</div>
+              <div class="label">Rescheduled / Postponed</div>
+            </div>
+            <div class="review-stat-pill">
+              <div class="num" style="color:var(--accent-blue);" id="eod-rate-val">0%</div>
+              <div class="label">Completion Rate</div>
+            </div>
+          </div>
+
+          <!-- Section Lists -->
+          <div class="review-section-title">✓ Completed Today</div>
+          <div class="review-list-items" id="list-completed-tasks"></div>
+
+          <div class="review-section-title">⏳ Unfinished Items</div>
+          <div class="review-list-items" id="list-unfinished-tasks"></div>
+
+          <div class="review-section-title">🔄 Rescheduled / Postponed</div>
+          <div class="review-list-items" id="list-postponed-tasks"></div>
+
+          <div class="review-section-title">⚠️ Upcoming Critical Deadlines</div>
+          <div class="review-list-items" id="list-upcoming-deadlines"></div>
+
+          <div style="margin-top:20px;display:flex;justify-content:flex-end;">
+            <button class="btn-secondary" id="btn-export-eod">
+              📄 Export Summary as Markdown
+            </button>
+          </div>
+        </div>
+
+        <!-- Weekly Trend Chart -->
+        <div class="chart-container">
+          <h3 style="font-size:1.15rem;margin-bottom:6px;">7-Day Task Completion Momentum</h3>
+          <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:14px;">Daily completed vs total planned items.</p>
+          <div class="weekly-bar-chart" id="weekly-chart-bars">
+            <!-- Weekly bars rendered dynamically -->
+          </div>
+        </div>
+      </section>
+
+      <!-- ===================================================================
+           VIEW 7: SETTINGS & PRIVACY
+           =================================================================== -->
+      <section class="view-container" id="view-settings">
+        <div class="settings-container">
+          <!-- Profile Card -->
+          <div class="settings-card">
+            <h3>👤 Profile & Identity</h3>
+            <p class="subtitle">Information for your authenticated MentiNous AI profile.</p>
+
+            <div class="settings-grid-2">
+              <div class="form-group">
+                <label>Full Name</label>
+                <div style="font-weight:600;font-size:1.05rem;" id="settings-profile-name">User</div>
+              </div>
+              <div class="form-group">
+                <label>Account Email</label>
+                <div style="font-weight:600;font-size:1.05rem;" id="settings-profile-email">user@mentinous.ai</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Preferences & Quiet Hours Card -->
+          <div class="settings-card">
+            <h3>⏰ Quiet Hours & Notifications</h3>
+            <p class="subtitle">Suppress task alerts during restful hours to avoid repeated interruptions.</p>
+
+            <form id="form-save-preferences">
+              <div class="settings-grid-2" style="margin-bottom:18px;">
+                <div class="form-group">
+                  <label for="setting-quiet-start">Quiet Hours Start</label>
+                  <input type="time" id="setting-quiet-start" value="22:00">
+                </div>
+                <div class="form-group">
+                  <label for="setting-quiet-end">Quiet Hours End</label>
+                  <input type="time" id="setting-quiet-end" value="07:00">
+                </div>
+              </div>
+
+              <div class="toggle-row">
+                <div class="toggle-info">
+                  <h4>In-App Proactive Reminders</h4>
+                  <p>Check in when scheduled tasks end to inquire if you need more time.</p>
+                </div>
+                <label class="switch">
+                  <input type="checkbox" id="setting-notif-enabled" checked>
+                  <span class="slider"></span>
+                </label>
+              </div>
+
+              <div class="toggle-row">
+                <div class="toggle-info">
+                  <h4>Audio Chimes & Sound Effects</h4>
+                  <p>Auditory feedback for completed tasks and MentiExercise games.</p>
+                </div>
+                <label class="switch">
+                  <input type="checkbox" id="setting-sound-enabled" checked>
+                  <span class="slider"></span>
+                </label>
+              </div>
+
+              <div style="margin-top:20px;text-align:right;">
+                <button type="submit" class="btn-primary">Save Preferences</button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Change Password Card -->
+          <div class="settings-card">
+            <h3>🔒 Change Password</h3>
+            <p class="subtitle">Update your credentials. Prototype requirement: exactly 4 characters.</p>
+
+            <form id="form-change-password">
+              <div class="form-group" style="margin-bottom:12px;">
+                <label for="pwd-current">Current Password (4 chars)</label>
+                <input type="password" id="pwd-current" maxlength="4" required>
+              </div>
+              <div class="settings-grid-2" style="margin-bottom:18px;">
+                <div class="form-group">
+                  <label for="pwd-new">New Password (4 chars)</label>
+                  <input type="password" id="pwd-new" maxlength="4" required>
+                </div>
+                <div class="form-group">
+                  <label for="pwd-confirm">Confirm New Password</label>
+                  <input type="password" id="pwd-confirm" maxlength="4" required>
+                </div>
+              </div>
+              <div style="text-align:right;">
+                <button type="submit" class="btn-secondary">Update Password</button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Privacy, Data Ownership & Export -->
+          <div class="settings-card">
+            <h3>🛡️ Privacy & Data Ownership</h3>
+            <p class="subtitle">Your data remains strictly isolated to your account. Download an offline backup anytime.</p>
+            <button class="btn-secondary" id="btn-export-data">
+              📥 Export All Account Data (JSON)
+            </button>
+          </div>
+
+          <!-- Danger Zone -->
+          <div class="settings-card danger-zone">
+            <h3>⚠️ Danger Zone</h3>
+            <p class="subtitle">Permanently delete your user account and all personal tasks, calendar events, and game records.</p>
+            <button class="btn-danger" id="btn-delete-account">
+              Delete Account Permanently
+            </button>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- =====================================================================
+       3. MODALS
+       ===================================================================== -->
+  <!-- Add Task Modal -->
+  <div class="modal-overlay" id="modal-add-task">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Create New Task</h3>
+        <button class="modal-close-btn" id="btn-close-task-modal">&times;</button>
+      </div>
+      <form id="form-add-task">
+        <div class="modal-body" style="display:flex;flex-direction:column;gap:14px;">
+          <div class="form-group">
+            <label for="task-input-title">Task Title *</label>
+            <input type="text" id="task-input-title" placeholder="e.g. Java practice & algorithms" required>
+          </div>
+          <div class="form-group">
+            <label for="task-input-desc">Description</label>
+            <textarea id="task-input-desc" placeholder="Specific objectives or notes..." rows="2"></textarea>
+          </div>
+          <div class="settings-grid-2">
+            <div class="form-group">
+              <label for="task-input-date">Scheduled Date</label>
+              <input type="date" id="task-input-date">
+            </div>
+            <div class="form-group">
+              <label for="task-input-time">Start Time</label>
+              <input type="time" id="task-input-time">
+            </div>
+          </div>
+          <div class="settings-grid-2">
+            <div class="form-group">
+              <label for="task-input-duration">Estimated Duration (mins)</label>
+              <input type="number" id="task-input-duration" value="60" min="5" step="5">
+            </div>
+            <div class="form-group">
+              <label for="task-input-priority">Priority</label>
+              <select id="task-input-priority">
+                <option value="high">High Priority</option>
+                <option value="medium" selected>Medium Priority</option>
+                <option value="low">Low Priority</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="task-input-deadline">Deadline (Optional)</label>
+            <input type="datetime-local" id="task-input-deadline">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary" id="btn-cancel-task">Cancel</button>
+          <button type="submit" class="btn-primary">Save Task</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Proactive Missed Task Modal (Proactive check-in with 4 distinct actions) -->
+  <div class="modal-overlay" id="modal-missed-task">
+    <div class="modal-content" style="max-width:500px;">
+      <div class="modal-header">
+        <h3 style="color:var(--accent-teal);">🔔 MentiNous AI Check-in</h3>
+      </div>
+      <div class="modal-body">
+        <p id="missed-task-prompt-text" style="font-size:1.05rem;line-height:1.5;margin-bottom:20px;font-weight:500;">
+          MentiNous AI — Your Java practice was scheduled to finish at 5 PM. Did you finish it, or do you need more time?
+        </p>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <button class="btn-primary" id="btn-notif-completed" style="justify-content:center;padding:12px;">
+            ✓ Mark as Completed
+          </button>
+          <button class="btn-teal" id="btn-notif-more-time" style="justify-content:center;padding:12px;">
+            ⏱️ Need More Time (+30m & Adjust Schedule)
+          </button>
+          <button class="btn-secondary" id="btn-notif-reschedule" style="justify-content:center;padding:12px;">
+            📅 Reschedule to Tomorrow
+          </button>
+          <button class="btn-secondary" id="btn-notif-dismiss" style="justify-content:center;padding:12px;color:var(--text-subtle);">
+            ✕ Dismiss
+          </button>
+        </div>
+        <div style="font-size:0.78rem;color:var(--text-subtle);text-align:center;margin-top:14px;">
+          Dismissing a reminder does not mark the task as failed or completed.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div id="toast-container"></div>
+
+  <!-- Master Client JS Bundle -->
+  <script type="module" src="/static/js/app.js"></script>
+</body>
+</html>

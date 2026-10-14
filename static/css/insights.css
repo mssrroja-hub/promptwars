@@ -1,0 +1,169 @@
+/* ==========================================================================
+   MennilNexus AI — Insights & End-of-Day Review Styles (Pastel Theme)
+   ========================================================================== */
+
+.insights-header {
+  margin-bottom: 24px;
+}
+
+.eod-review-card {
+  background: #FFFFFF;
+  border: 1.5px solid var(--pastel-lavender-border);
+  border-radius: var(--radius-xl);
+  padding: 34px;
+  margin-bottom: 28px;
+  box-shadow: var(--shadow-card);
+}
+
+.supportive-banner {
+  background: linear-gradient(135deg, #EDFDF5 0%, #D9F8E8 100%);
+  border-left: 5px solid #10B981;
+  padding: 16px 20px;
+  border-radius: var(--radius-md);
+  color: #065F46;
+  font-size: 0.96rem;
+  font-weight: 600;
+  line-height: 1.5;
+  margin-bottom: 26px;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.08);
+}
+
+.review-breakdown-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 18px;
+  margin-bottom: 30px;
+}
+
+.review-stat-pill {
+  border-radius: var(--radius-lg);
+  padding: 18px;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+  transition: var(--transition-smooth);
+}
+.review-stat-pill:hover {
+  transform: translateY(-2px);
+}
+.review-stat-pill.pill-mint {
+  background: #EDFDF5;
+  border: 1.5px solid var(--pastel-mint-border);
+}
+.review-stat-pill.pill-peach {
+  background: #FFF3EB;
+  border: 1.5px solid var(--pastel-peach-border);
+}
+.review-stat-pill.pill-lavender {
+  background: #F4EFFF;
+  border: 1.5px solid var(--pastel-lavender-border);
+}
+.review-stat-pill.pill-blue {
+  background: #F0F8FF;
+  border: 1.5px solid var(--pastel-baby-blue-border);
+}
+
+.review-stat-pill .num {
+  font-size: 2rem;
+  font-weight: 800;
+  font-family: var(--font-heading);
+}
+.review-stat-pill .num.completed { color: #059669; }
+.review-stat-pill .num.unfinished { color: #D97706; }
+.review-stat-pill .num.postponed { color: var(--accent-purple); }
+.review-stat-pill .num.rate { color: #0284C7; }
+
+.review-stat-pill .label {
+  font-size: 0.84rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin-top: 4px;
+}
+
+/* Review Lists */
+.review-section-title {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--text-main);
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.review-list-items {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 26px;
+}
+
+.review-item-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 18px;
+  background: #FAF8FF;
+  border-radius: var(--radius-md);
+  border: 1.5px solid var(--border-subtle);
+  border-left: 4px solid var(--accent-purple);
+  font-size: 0.92rem;
+  color: var(--text-main);
+}
+.review-item-row.completed { border-left-color: #10B981; background: #F2FDF7; }
+.review-item-row.unfinished { border-left-color: #F59E0B; background: #FFFBEB; }
+.review-item-row.postponed { border-left-color: var(--accent-purple); background: #F8F4FF; }
+.review-item-row.deadline { border-left-color: #F43F5E; background: #FFF1F2; }
+
+/* Weekly Chart Visualization */
+.chart-container {
+  background: #FFFFFF;
+  border: 1.5px solid var(--border-subtle);
+  border-radius: var(--radius-xl);
+  padding: 28px;
+  margin-bottom: 28px;
+  box-shadow: var(--shadow-card);
+}
+
+.weekly-bar-chart {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  height: 190px;
+  gap: 16px;
+  padding-top: 24px;
+}
+
+.bar-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.bar-tube {
+  width: 100%;
+  max-width: 42px;
+  background: #F1EDFF;
+  border-radius: 8px;
+  height: 100%;
+  display: flex;
+  align-items: flex-end;
+  overflow: hidden;
+}
+
+.bar-fill {
+  width: 100%;
+  background: linear-gradient(180deg, #8B5CF6, #38BDF8);
+  border-radius: 8px 8px 0 0;
+  transition: height 0.6s ease;
+  min-height: 4px;
+}
+
+.bar-day-name {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text-muted);
+}

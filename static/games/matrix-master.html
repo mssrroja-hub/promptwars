@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Matrix Master — MennilNexus AI Mental Fitness</title>
+  <link rel="stylesheet" href="/static/css/main.css">
+  <style>
+    body {
+      background: var(--bg-cream);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      padding: 24px;
+      position: relative;
+    }
+    body::before {
+      content: '';
+      position: fixed;
+      top: -100px;
+      right: 15%;
+      width: 450px;
+      height: 450px;
+      background: radial-gradient(circle, rgba(233, 223, 255, 0.5) 0%, rgba(255, 224, 237, 0.3) 60%, transparent 75%);
+      pointer-events: none;
+      z-index: 0;
+    }
+    .game-wrapper {
+      max-width: 720px;
+      width: 100%;
+      background: #FFFFFF;
+      border: 1.5px solid var(--pastel-lavender-border);
+      border-radius: var(--radius-xl);
+      padding: 32px;
+      box-shadow: var(--shadow-card);
+      position: relative;
+      z-index: 1;
+    }
+    .game-top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 16px;
+      border-bottom: 1.5px solid var(--border-subtle);
+    }
+    .stat-pill {
+      font-size: 0.88rem;
+      background: var(--pastel-lavender-light);
+      border: 1px solid var(--pastel-lavender-border);
+      color: var(--text-main);
+      padding: 6px 14px;
+      border-radius: var(--radius-full);
+      font-weight: 700;
+    }
+    .matrix-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin: 20px auto;
+      max-width: 440px;
+    }
+    .matrix-cell {
+      aspect-ratio: 1;
+      background: #FAF8FF;
+      border: 2px solid var(--pastel-lavender-border);
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.2rem;
+      color: var(--accent-purple);
+      transition: transform 0.2s ease;
+      box-shadow: 0 4px 10px rgba(139, 92, 246, 0.05);
+    }
+    .matrix-cell.missing {
+      border: 2.5px dashed var(--accent-purple);
+      background: var(--pastel-pink-light);
+      color: var(--accent-purple);
+      font-weight: 800;
+    }
+    .choices-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-top: 24px;
+    }
+    .choice-btn {
+      aspect-ratio: 1.2;
+      background: #FFFFFF;
+      border: 2px solid var(--border-medium);
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      color: var(--text-main);
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(139, 92, 246, 0.06);
+      transition: all 0.2s ease;
+    }
+    .choice-btn:hover {
+      border-color: var(--accent-purple);
+      background: var(--pastel-lavender-light);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 18px rgba(139, 92, 246, 0.14);
+    }
+    .choice-btn.correct {
+      border-color: #10B981 !important;
+      background: var(--pastel-mint) !important;
+      color: #047857 !important;
+    }
+    .choice-btn.wrong {
+      border-color: #F43F5E !important;
+      background: var(--pastel-pink) !important;
+      color: #BE123C !important;
+    }
+    .feedback-banner {
+      margin-top: 16px;
+      padding: 12px 16px;
+      border-radius: var(--radius-md);
+      font-size: 0.9rem;
+      display: none;
+      text-align: center;
+      font-weight: 600;
+    }
+    .modal-overlay-game {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(36, 36, 94, 0.45);
+      backdrop-filter: blur(8px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+    }
+    .modal-overlay-game.active {
+      display: flex;
+    }
+  </style>
+</head>
+<body>
+
+<div class="game-wrapper">
+  <div class="game-top-bar">
+    <div>
+      <h2 style="font-size:1.35rem;font-weight:700;">🧩 Matrix Master</h2>
+      <div style="font-size:0.8rem;color:var(--accent-teal);">Pattern & Spatial Reasoning</div>
+    </div>
+    <div style="display:flex;gap:10px;align-items:center;">
+      <span class="stat-pill" id="game-timer">⏱ 05:00</span>
+      <span class="stat-pill" style="color:var(--accent-lavender);" id="game-score">Score: 0</span>
+      <span class="stat-pill" id="game-level">Lvl 1</span>
+      <button class="btn-secondary" id="btn-show-instructions" style="padding:6px 12px;font-size:0.82rem;">Rules</button>
+      <button class="btn-secondary" id="btn-exit-game" style="padding:6px 12px;font-size:0.82rem;">Exit</button>
+    </div>
+  </div>
+
+  <div style="text-align:center;font-size:0.92rem;color:var(--text-muted);margin-bottom:8px;">
+    Examine the rows and columns. Determine the underlying logical rule to identify the missing 9th element:
+  </div>
+
+  <div class="matrix-grid" id="matrix-container">
+    <!-- 3x3 Cells rendered dynamically -->
+  </div>
+
+  <div style="text-align:center;font-size:0.85rem;color:var(--text-subtle);margin-top:16px;">
+    Select the correct tile:
+  </div>
+
+  <div class="choices-grid" id="choices-container">
+    <!-- 4 Choices -->
+  </div>
+
+  <div class="feedback-banner" id="feedback-banner"></div>
+</div>
+
+<!-- Time Up / Completion Modal -->
+<div class="modal-overlay-game" id="modal-game-over">
+  <div class="modal-content" style="max-width:440px;text-align:center;padding:32px;">
+    <div style="font-size:2.8rem;margin-bottom:8px;">🏆</div>
+    <h3 style="font-size:1.5rem;font-weight:700;margin-bottom:6px;">Session Complete!</h3>
+    <p style="color:var(--text-muted);font-size:0.9rem;margin-bottom:20px;">
+      Outstanding mental workout! Your cognitive focus and pattern recognition are sharpening.
+    </p>
+
+    <div style="background:rgba(255,255,255,0.05);padding:16px;border-radius:12px;margin-bottom:24px;">
+      <div style="font-size:2rem;font-weight:800;color:var(--accent-teal);" id="final-score-val">0</div>
+      <div style="font-size:0.82rem;color:var(--text-muted);">Points Earned</div>
+      <div style="margin-top:8px;font-size:0.88rem;color:var(--accent-lavender);" id="final-accuracy-val">Accuracy: 100%</div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      <button class="btn-primary" id="btn-save-and-exit" style="width:100%;padding:12px;">
+        💾 Save Score & Return to App
+      </button>
+      <button class="btn-secondary" id="btn-keep-playing" style="width:100%;padding:12px;">
+        🎮 Keep Playing (Casual Mode)
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Instructions Modal -->
+<div class="modal-overlay-game" id="modal-instructions">
+  <div class="modal-content" style="max-width:480px;padding:28px;">
+    <h3 style="margin-bottom:12px;">How to Play Matrix Master</h3>
+    <ul style="color:var(--text-muted);font-size:0.9rem;line-height:1.6;margin-left:20px;margin-bottom:20px;">
+      <li>Look at each row or column in the 3x3 matrix to identify geometric relationships.</li>
+      <li>Patterns include shape rotation, number of symbols, dot counts, and progression.</li>
+      <li>Click on one of the 4 candidate tiles below that fits the missing spot.</li>
+      <li>Points are awarded based on accuracy and speed.</li>
+      <li>Your session lasts for the selected duration (2, 5, or 10 mins). You will never be forced to exit when time expires!</li>
+    </ul>
+    <button class="btn-primary" id="btn-close-instructions" style="width:100%;padding:10px;">Got It, Let's Play</button>
+  </div>
+</div>
+
+<script type="module">
+  import { apiRequest, AuthState, showToast } from '/static/js/api.js';
+
+  // Read duration query param (?duration=2, 5, 10)
+  const urlParams = new URLSearchParams(window.location.search);
+  let sessionMinutes = parseInt(urlParams.get('duration') || 5);
+  let timeRemaining = sessionMinutes * 60;
+  let score = 0;
+  let level = 1;
+  let questionsAnswered = 0;
+  let questionsCorrect = 0;
+  let timerInterval = null;
+  let isCasualMode = false;
+
+  const patterns = [
+    // Pattern 1: Progressive dot counts
+    {
+      cells: ['●', '●●', '●●●', '▲', '▲▲', '▲▲▲', '■', '■■', '?'],
+      answer: '■■■',
+      options: ['■', '■■', '■■■', '●●●●'],
+      rule: 'Each row increases symbol count: 1, 2, 3.'
+    },
+    // Pattern 2: Shape rotations
+    {
+      cells: ['▲', '▶', '▼', '◀', '▲', '▶', '▼', '◀', '?'],
+      answer: '▲',
+      options: ['▲', '▶', '▼', '◀'],
+      rule: '90-degree clockwise rotation pattern across cells.'
+    },
+    // Pattern 3: Math sequence matrix
+    {
+      cells: ['2', '4', '8', '3', '9', '27', '4', '16', '?'],
+      answer: '64',
+      options: ['32', '48', '64', '80'],
+      rule: 'Each row follows exponential growth (x, x^2, x^3).'
+    },
+    // Pattern 4: Complementary symbols
+    {
+      cells: ['✦', '✧', '✦', '✧', '✦', '✧', '✦', '✧', '?'],
+      answer: '✦',
+      options: ['✦', '✧', '★', '☆'],
+      rule: 'Alternating solid and hollow star sequence.'
+    },
+    // Pattern 5: Matrix sum
+    {
+      cells: ['1', '2', '3', '4', '5', '9', '2', '6', '?'],
+      answer: '8',
+      options: ['7', '8', '10', '12'],
+      rule: 'In each row, Column 1 + Column 2 = Column 3.'
+    }
+  ];
+
+  let currentPatternIndex = 0;
+
+  function initGame() {
+    renderPattern();
+    startTimer();
+
+    document.getElementById('btn-show-instructions').onclick = () => {
+      document.getElementById('modal-instructions').classList.add('active');
+    };
+    document.getElementById('btn-close-instructions').onclick = () => {
+      document.getElementById('modal-instructions').classList.remove('active');
+    };
+    document.getElementById('btn-exit-game').onclick = () => {
+      if (confirm('Exit Matrix Master?')) window.close();
+    };
+
+    document.getElementById('btn-keep-playing').onclick = () => {
+      document.getElementById('modal-game-over').classList.remove('active');
+      isCasualMode = true;
+      document.getElementById('game-timer').textContent = 'Casual Mode ♾️';
+    };
+
+    document.getElementById('btn-save-and-exit').onclick = async () => {
+      await saveScoreToDb();
+      window.close();
+    };
+  }
+
+  function renderPattern() {
+    const p = patterns[currentPatternIndex % patterns.length];
+    const matrixContainer = document.getElementById('matrix-container');
+    const choicesContainer = document.getElementById('choices-container');
+    const banner = document.getElementById('feedback-banner');
+
+    banner.style.display = 'none';
+
+    matrixContainer.innerHTML = p.cells.map((val, idx) => {
+      const isMissing = val === '?';
+      return `<div class="matrix-cell ${isMissing ? 'missing' : ''}">${val}</div>`;
+    }).join('');
+
+    // Shuffle options
+    const shuffled = [...p.options].sort(() => Math.random() - 0.5);
+    choicesContainer.innerHTML = shuffled.map(opt => `
+      <button class="choice-btn" data-val="${opt}">${opt}</button>
+    `).join('');
+
+    choicesContainer.querySelectorAll('.choice-btn').forEach(btn => {
+      btn.onclick = () => handleChoice(btn.dataset.val, p.answer, p.rule);
+    });
+  }
+
+  function handleChoice(selected, correct, rule) {
+    questionsAnswered++;
+    const banner = document.getElementById('feedback-banner');
+    const choiceBtns = document.querySelectorAll('.choice-btn');
+
+    choiceBtns.forEach(b => {
+      b.disabled = true;
+      if (b.dataset.val === correct) b.classList.add('correct');
+      if (b.dataset.val === selected && selected !== correct) b.classList.add('wrong');
+    });
+
+    if (selected === correct) {
+      questionsCorrect++;
+      score += 150 + (level * 20);
+      document.getElementById('game-score').textContent = `Score: ${score}`;
+      banner.style.display = 'block';
+      banner.style.background = 'rgba(20, 184, 166, 0.2)';
+      banner.style.color = '#5eead4';
+      banner.innerHTML = `✓ <strong>Correct!</strong> ${rule}`;
+    } else {
+      banner.style.display = 'block';
+      banner.style.background = 'rgba(244, 63, 94, 0.2)';
+      banner.style.color = '#fda4af';
+      banner.innerHTML = `✕ <strong>Incorrect.</strong> Rule: ${rule}`;
+    }
+
+    if (questionsAnswered % 3 === 0) {
+      level++;
+      document.getElementById('game-level').textContent = `Lvl ${level}`;
+    }
+
+    setTimeout(() => {
+      currentPatternIndex++;
+      renderPattern();
+    }, 1800);
+  }
+
+  function startTimer() {
+    const timerEl = document.getElementById('game-timer');
+    timerInterval = setInterval(() => {
+      if (isCasualMode) return;
+      timeRemaining--;
+
+      const mins = Math.floor(timeRemaining / 60);
+      const secs = timeRemaining % 60;
+      timerEl.textContent = `⏱ ${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+
+      if (timeRemaining <= 0) {
+        clearInterval(timerInterval);
+        handleTimeUp();
+      }
+    }, 1000);
+  }
+
+  function handleTimeUp() {
+    const accuracy = questionsAnswered > 0 ? Math.round((questionsCorrect / questionsAnswered) * 100) : 100;
+    document.getElementById('final-score-val').textContent = score.toLocaleString();
+    document.getElementById('final-accuracy-val').textContent = `Accuracy: ${accuracy}% (${questionsCorrect}/${questionsAnswered} correct)`;
+    document.getElementById('modal-game-over').classList.add('active');
+
+    // Auto-save score in background
+    saveScoreToDb();
+  }
+
+  async function saveScoreToDb() {
+    const accuracy = questionsAnswered > 0 ? Math.round((questionsCorrect / questionsAnswered) * 100) : 100;
+    try {
+      await apiRequest('/games/scores', 'POST', {
+        game_id: 'matrix-master',
+        score,
+        level_reached: level,
+        duration_sec: sessionMinutes * 60,
+        accuracy
+      });
+    } catch (err) {
+      console.warn('Score auto-save notice:', err);
+    }
+  }
+
+  window.onload = initGame;
+</script>
+</body>
+</html>
